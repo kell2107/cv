@@ -164,15 +164,12 @@
     <script src="js/kube.min.js"></script>
     <script src="js/site.js"></script>
     <script>
-        function newTyped() {}
-        $(function() {
-            $("#typed").typed({
-                strings: ["Communication digitale", "SEO & Stratégie", "Développement web"],
-                typeSpeed: 90,
-                backDelay: 700,
-                loop: true
-            });
-        });
+function newTyped(){}$(function(){$("#typed").typed({
+		// Change to edit type effect
+		strings: ["Communication digitale", "SEO & Stratégie", "Développement web"],
+
+		typeSpeed:90,backDelay:700,contentType:"html",loop:!0,resetCallback:function(){newTyped()}}),$(".reset").click(function(){$("#typed").typed("reset")})});
+        
     </script>
 </body>
 </html>
