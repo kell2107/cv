@@ -39,7 +39,7 @@ Il met en valeur l’importance de la visualisation de données pour mieux compr
 **Pour aller plus loin**
 - Documentation officielle D3.js : [https://d3js.org/](https://d3js.org/)  
 - Tutoriel : [ObservableHQ Density Contours](https://observablehq.com/@d3/density-contours)  
-- Données ouvertes : [https://data.gouv.fr](https://data.gouv.fr) et [https://opendata.paris.fr](https://opendata.paris.fr)
+- Exemple de données ouvertes que je pourrais utiliser : [https://data.gouv.fr](https://data.gouv.fr) et [https://opendata.paris.fr](https://opendata.paris.fr)
 
 **Pourquoi ce choix ?**
 J’ai choisi ce projet car il illustre concrètement comment les données peuvent devenir visuelles et intelligibles grâce au code.  
