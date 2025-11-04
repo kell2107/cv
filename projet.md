@@ -1,7 +1,7 @@
 # Visualisation de densité de données avec D3.js ("Density Contours")
 
 **Description**
-Ce projet consiste à créer une visualisation interactive de densité de points avec la bibliothèque **D3.js**.  
+Mon projet consistera à créer une visualisation interactive de densité de points avec la bibliothèque **D3.js**.  
 L’objectif est de représenter la concentration de données (par exemple des coordonnées géographiques ou des événements) sous forme de contours colorés, permettant d’identifier visuellement les zones les plus denses.
 
 Inspiré du projet officiel : [D3 Density Contours](https://observablehq.com/@d3/density-contours)
@@ -42,6 +42,7 @@ Il met en valeur l’importance de la visualisation de données pour mieux compr
 - Exemple de données ouvertes que je pourrais utiliser : [https://data.gouv.fr](https://data.gouv.fr) et [https://opendata.paris.fr](https://opendata.paris.fr)
 
 **Pourquoi ce choix ?**
+
 J’ai choisi ce projet car il illustre concrètement comment les données peuvent devenir visuelles et intelligibles grâce au code.  
 Il combine programmation, design et exploration urbaine, trois aspects essentiels du numérique aujourd’hui.  
 Ce projet permet aussi d’explorer la ville de Paris et sa région à travers une approche graphique et interactive.
