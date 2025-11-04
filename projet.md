@@ -1,6 +1,7 @@
 # Visualisation de densité de données avec D3.js ("Density Contours")
 
 **Description**
+
 Mon projet consistera à créer une visualisation interactive de densité de points avec la bibliothèque **D3.js**.  
 L’objectif est de représenter la concentration de données (par exemple des coordonnées géographiques ou des événements) sous forme de contours colorés, permettant d’identifier visuellement les zones les plus denses.
 
