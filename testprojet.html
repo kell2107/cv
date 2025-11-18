@@ -1,1 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prototype – D3.js Density Contours</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    #chart {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    svg {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Prototype : Visualisation de Densité (D3.js)</h1>
+  <div id="chart"></div>
+
+  <!-- Import D3.js v7 -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    // Dimensions du SVG
+    const width = 800;
+    const height = 600;
+
+    // Sélection du conteneur
+    const svg = d3
+      .select("#chart")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    // 1. Chargement du fichier CSV Vélib
+    d3.csv("velib-disponibilite-en-temps-reel.csv").then(data => {
+
+      // Conversion des coordonnées en nombres
+      const points = data.map(d => [
+        +d.longitude,
+        +d.latitude
+      ]).filter(d => !isNaN(d[0]) && !isNaN(d[1]));
+
+      // 2. Échelles pour projeter les coordonnées dans le SVG
+      const x = d3.scaleLinear()
+        .domain(d3.extent(points, d => d[0]))
+        .range([0, width]);
+
+      const y = d3.scaleLinear()
+        .domain(d3.extent(points, d => d[1]))
+        .range([height, 0]);
+
+      // 3. Contours de densité
+      const density = d3.contourDensity()
+        .x(d => x(d[0]))
+        .y(d => y(d[1]))
+        .size([width, height])
+        .bandwidth(20)
+        (points);
+
+      const color = d3.scaleSequential(d3.interpolateTurbo)
+        .domain([0, d3.max(density, d => d.value)]);
+
+      svg.selectAll("path")
+        .data(density)
+        .join("path")
+        .attr("d", d3.geoPath())
+        .attr("fill", d => color(d.value))
+        .attr("stroke", "#333")
+        .attr("stroke-width", 0.3)
+        .attr("opacity", 0.85);
+
+      // 4. Affichage des points Vélib
+      svg.selectAll("circle")
+        .data(points)
+        .join("circle")
+        .attr("cx", d => x(d[0]))
+        .attr("cy", d => y(d[1]))
+        .attr("r", 2)
+        .attr("fill", "black")
+        .attr("opacity", 0.4);
+    });("path")
+      .data(density)
+      .join("path")
+      .attr("d", d3.geoPath())
+      .attr("fill", d => color(d.value))
+      .attr("stroke", "#333")
+      .attr("stroke-width", 0.3)
+      .attr("opacity", 0.85);
+
+    // 5. Affichage des points (optionnel)
+    svg.selectAll("circle")
+      .data(points)
+      .join("circle")
+      .attr("cx", d => d[0])
+      .attr("cy", d => d[1])
+      .attr("r", 2)
+      .attr("fill", "black")
+      .attr("opacity", 0.4);
+  </script>
+</body>
+</html>
 
