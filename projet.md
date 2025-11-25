@@ -58,3 +58,8 @@ Ce projet permet aussi d’explorer la ville de Paris et sa région à travers u
 
 Dans une version ultérieure, je souhaite personnaliser entièrement le rendu graphique (couleurs, styles, échelles) et intégrer des données réelles librre d'acces de la ville de paris.  
 L’objectif sera de représenter la **densité de fréquentation ou de points d’intérêt dans Paris et l’Île-de-France**, afin d’explorer les dynamiques de mobilité et d’activité urbaine à travers la visualisation de données.
+
+
+25/11/25
+
+
