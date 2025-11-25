@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carte de densité Vélib – Leaflet interactive + D3</title>
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- D3 -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+    h1{
+      text-align:center;
+      margin: 8px 0 12px;
+    }
+
+    /* Conteneur responsive */
+    #map {
+      width: 100%;
+      max-width: 1000px;
+      height: min(75vh, 700px);
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      overflow: hidden;
+      background: white;
+      position: relative;
+    }
+
+    /* Encadré infos */
+    #info {
+      width: 100%;
+      max-width: 1000px;
+      margin: 10px auto 0;
+      background: white;
+      border-radius: 8px;
+      padding: 10px 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    #info h2 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+    #info .muted { color:#666; font-style: italic; }
+  </style>
+</head>
+
+<body>
+  <h1>Carte de densité des stations Vélib – Leaflet + D3</h1>
+
+  <div id="map"></div>
+
+  <div id="info">
+    <h2>Informations station</h2>
+    <div class="muted">Clique sur un point pour voir les détails.</div>
+  </div>
+
+  <script>
+    const mapEl = document.getElementById("map");
+    const infoBox = document.getElementById("info");
+    const safe = v => (v === undefined || v === null || v === "") ? "N/A" : v;
+
+    // 1) Carte Leaflet INTERACTIVE
+    const map = L.map("map").setView([48.8566, 2.3522], 12);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap"
+    }).addTo(map);
+
+    // 2) Overlay SVG Leaflet pour D3
+    L.svg().addTo(map);
+    const overlay = d3.select("#map").select("svg");
+    const g = overlay.append("g").attr("class", "leaflet-zoom-hide");
+
+    let points = [];
+
+    // 3) Charger le CSV
+    d3.dsv(";", "velib-disponibilite-en-temps-reel.csv", d => {
+      const geo = d["Coordonnées géographiques"];
+      if (!geo) return null;
+
+      const [latStr, lonStr] = geo.split(",");
+      const lat = Number(latStr?.trim());
+      const lon = Number(lonStr?.trim());
+
+      if (Number.isNaN(lat) || Number.isNaN(lon)) return null;
+
+      d.lat = lat;
+      d.lon = lon;
+      return d;
+    })
+    .then(data => {
+      points = data.filter(Boolean);
+      render();                       // premier rendu
+      map.on("zoomend moveend", render); // MAJ au zoom/déplacement
+    })
+    .catch(err => console.error("Erreur de chargement CSV :", err));
+
+    // Projection Leaflet -> pixels
+    const projectPoint = (lat, lon) => {
+      const p = map.latLngToLayerPoint([lat, lon]);
+      return [p.x, p.y];
+    };
+
+    // 4) Rendu D3 aligné à la carte
+    function render() {
+      if (!points.length) return;
+
+      const size = map.getSize();
+      const width = size.x;
+      const height = size.y;
+
+      overlay
+        .attr("width", width)
+        .attr("height", height)
+        .attr("viewBox", `0 0 ${width} ${height}`);
+
+      // Reprojeter en pixels à chaque interaction
+      const pixelPoints = points.map(d => {
+        const [x, y] = projectPoint(d.lat, d.lon);
+        return { ...d, x, y };
+      });
+
+      // Densité (sur pixels)
+      const density = d3.contourDensity()
+        .x(d => d.x)
+        .y(d => d.y)
+        .size([width, height])
+        .bandwidth(25)
+        (pixelPoints);
+
+      const color = d3.scaleSequential(d3.interpolateTurbo)
+        .domain([0, d3.max(density, d => d.value)]);
+
+   // --- Contours de densité (NE capte pas les clics) ---
+g.selectAll("path.density")
+  .data(density)
+  .join("path")
+  .attr("class", "density")
+  .attr("d", d3.geoPath())
+  .attr("fill", d => color(d.value))
+  .attr("stroke", "#333")
+  .attr("stroke-width", 0.15)
+  .attr("opacity", 0.35)
+  .style("pointer-events", "none"); // ✅ super important
+
+
+// --- Cercles stations (captent bien les clics) ---
+g.selectAll("circle.station")
+  .data(pixelPoints, d => d["Nom station"])
+  .join("circle")
+  .attr("class", "station")
+  .attr("cx", d => d.x)
+  .attr("cy", d => d.y)
+  .attr("r", 4)
+  .attr("fill", "black")
+  .attr("opacity", 0.55)
+  .style("cursor", "pointer")
+  .style("pointer-events", "all")   // ✅ les cercles restent cliquables
+  .on("click", (event, d) => {
+    event.originalEvent?.stopPropagation(); // ✅ évite que Leaflet prenne le clic
+
+    infoBox.innerHTML = `
+      <h2>Informations station</h2>
+      <div><strong>Station :</strong> ${d["Nom station"] ?? "N/A"}</div>
+      <div><strong>Capacité de la station :</strong> ${d["Capacité de la station"] ?? "N/A"}</div>
+      <div><strong>Nombre bornettes libres :</strong> ${d["Nombre bornettes libres"] ?? "N/A"}</div>
+    `;
+  });
+   // Contours
+      g.selectAll("path.density")
+        .data(density)
+        .join("path")
+        .attr("class", "density")
+        .attr("d", d3.geoPath())
+        .attr("fill", d => color(d.value))
+        .attr("stroke", "#333")
+        .attr("stroke-width", 0.15)
+        .attr("opacity", 0.35);
+
+      // Points stations
+      g.selectAll("circle.station")
+        .data(pixelPoints, d => d["Nom station"])
+        .join("circle")
+        .attr("class", "station")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", Math.max(3, width / 300))
+        .attr("fill", "black")
+        .attr("opacity", 0.55)
+        .style("cursor", "pointer")
+        .on("click", (event, d) => {
+          infoBox.innerHTML = `
+            <h2>Informations station</h2>
+            <div><strong>Station :</strong> ${safe(d["Nom station"])}</div>
+            <div><strong>Capacité de la station :</strong> ${safe(d["Capacité de la station"])}</div>
+            <div><strong>Nombre bornettes libres :</strong> ${safe(d["Nombre bornettes libres"])}</div>
+          `;
+        });
+    }
+
+    // 5) Responsive
+    const ro = new ResizeObserver(() => {
+      map.invalidateSize();
+      render();
+    });
+    ro.observe(mapEl);
+  </script>
+</body>
+</html>
