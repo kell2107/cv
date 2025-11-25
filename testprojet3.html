@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carte densité Vélib – D3.js + Leaflet (responsive)</title>
+
+  <!-- Leaflet (fond de carte) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- D3 -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 10px 0 16px;
+    }
+
+    /* Conteneur responsive */
+    #chart {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      overflow: hidden;
+      background: white;
+
+      /* hauteur adaptable : 16/9 environ */
+      aspect-ratio: 900 / 650;
+      /* fallback si aspect-ratio pas supporté */
+      height: min(70vh, 650px);
+    }
+
+    /* Carte Leaflet en fond */
+    #map {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* SVG D3 au-dessus */
+    svg {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: transparent;
+      pointer-events: auto;
+    }
+
+    /* Leaflet ne capte pas les clics */
+    #map .leaflet-tile-pane,
+    #map .leaflet-overlay-pane,
+    #map .leaflet-control-container {
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Carte de densité des stations Vélib – D3.js</h1>
+
+  <div id="chart">
+    <div id="map"></div>
+    <!-- SVG D3 injecté ici -->
+  </div>
+
+  <script>
+    const chartEl = document.getElementById("chart");
+
+    // 1) Leaflet = juste fond statique
+    const map = L.map("map", {
+      zoomControl: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      dragging: false,
+      touchZoom: false,
+      boxZoom: false,
+      keyboard: false
+    }).setView([48.8566, 2.3522], 12);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap"
+    }).addTo(map);
+
+    // 2) SVG D3
+    const svg = d3.select("#chart").append("svg");
+    const g = svg.append("g");
+
+    let points = []; // données propres
+
+    // Charge CSV
+    d3.dsv(";", "velib-disponibilite-en-temps-reel.csv", d => {
+      const geo = d["Coordonnées géographiques"];
+      if (!geo) return null;
+
+      const [lat, lon] = geo.split(",").map(Number);
+      d.lat = lat;
+      d.lon = lon;
+      return d;
+    })
+    .then(data => {
+      points = data.filter(d => d && !isNaN(d.lat) && !isNaN(d.lon));
+      render(); // premier rendu
+    })
+    .catch(error => console.error("Erreur de chargement CSV :", error));
+
+    // --- Rendu responsive ---
+    function render() {
+      if (!points.length) return;
+
+      const rect = chartEl.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+
+      // Resize SVG
+      svg.attr("width", width).attr("height", height)
+         .attr("viewBox", `0 0 ${width} ${height}`);
+
+      // Important pour Leaflet quand le conteneur change
+      map.invalidateSize();
+
+      // Échelles D3 (même logique que ton code)
+      const x = d3.scaleLinear()
+        .domain(d3.extent(points, d => d.lon))
+        .range([0, width]);
+
+      const y = d3.scaleLinear()
+        .domain(d3.extent(points, d => d.lat))
+        .range([height, 0]);
+
+      // Densité (même logique, juste taille dynamique)
+      const density = d3.contourDensity()
+        .x(d => x(d.lon))
+        .y(d => y(d.lat))
+        .size([width, height])
+        .bandwidth(25)
+        (points);
+
+      const color = d3.scaleSequential(d3.interpolateTurbo)
+        .domain([0, d3.max(density, d => d.value)]);
+
+      // Contours
+      g.selectAll("path")
+        .data(density)
+        .join("path")
+        .attr("d", d3.geoPath())
+        .attr("fill", d => color(d.value))
+        .attr("stroke", "#333")
+        .attr("stroke-width", 0.1)
+        .attr("opacity", 0.35);
+
+      // Points + clic infos
+      g.selectAll("circle")
+        .data(points)
+        .join("circle")
+        .attr("cx", d => x(d.lon))
+        .attr("cy", d => y(d.lat))
+        .attr("r", Math.max(3, width / 300)) // rayon adaptatif
+        .style("cursor", "pointer")
+        .attr("fill", "black")
+        .attr("opacity", 0.5)
+        .on("click", (event, d) => {
+          alert(
+            `Station : ${d["Nom station"]}\n` +
+            `Capacité de la station : ${d["Capacité de la station"]}\n` +
+            `Nombre bornettes libres : ${d["Nombre bornettes libres"]}`
+          );
+        });
+    }
+
+    // Observer de resize (s’adapte à la fenêtre)
+    const ro = new ResizeObserver(() => render());
+    ro.observe(chartEl);
+
+    window.addEventListener("orientationchange", render);
+  </script>
+
+</body>
+</html>
