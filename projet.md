@@ -66,12 +66,16 @@ Introduction
 
 Mais en avançant, je me suis rendu compte que les contours, affichés seuls sur un fond blanc, restaient assez abstraits. Sans repères géographiques, il devenait difficile de situer précisément les zones les plus denses. J’ai donc décidé de modifier ma trajectoire : comme mes données représentaient des stations Vélib à Paris, j’ai intégré un fond de carte Leaflet/OpenStreetMap pour donner un contexte spatial clair. Ensuite, j’ai amélioré le projet progressivement avec un peu d’interactivité et une version responsive.
 
-**Ressources et exemples utilisés*
+**Ressources et exemples utilisés**
 
 Exemple officiel D3 Density Contours (ObservableHQ)
+
 Documentation de d3.contourDensity()
+
 D3 Graph Gallery (exemples densité 2D)
+
 Dataset Vélib open data : velib-disponibilite-en-temps-reel.csv
+
 Leaflet + OpenStreetMap
 
 **Étapes de réalisation et prototype**s
@@ -82,9 +86,13 @@ Objectif : afficher une densité sur les stations Vélib.
 Ce que j’ai fait :
 
 Chargement du CSV Vélib (d3.dsv avec séparateur ;).
+
 Extraction et conversion des coordonnées "Coordonnées géographiques" → lat/lon.
+
 Création des échelles x et y.
+
 Calcul et affichage de la densité avec d3.contourDensity().
+
 Ajout des points des stations par-dessus.
 
 **Résultat : densité correcte sur données réelles, mais sans carte de fond.**
@@ -93,9 +101,12 @@ Ajout des points des stations par-dessus.
 
 Objectif : rendre les stations cliquables.
 
-Améliorations :
+**Améliorations :**
+
 Conservation des infos complètes dans chaque ligne (return d).
+
 Points plus visibles (r=4).
+
 Clic sur une station → alerte affichant le nom.
 
 **Résultat : exploration station par station.**
