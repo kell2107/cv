@@ -78,8 +78,9 @@ Dataset Vélib open data : velib-disponibilite-en-temps-reel.csv
 
 Leaflet + OpenStreetMap
 
-**Étapes de réalisation et prototype**s
-1) testprojet.html — Première version fonctionnelle avec D3
+**Étapes de réalisation et prototype**
+
+**testprojet.html — Première version fonctionnelle avec D3**
 
 Objectif : afficher une densité sur les stations Vélib.
 
@@ -97,32 +98,7 @@ Ajout des points des stations par-dessus.
 
 **Résultat : densité correcte sur données réelles, mais sans carte de fond.**
 
-2) testprojet1.html — Ajout d’interaction simple
-
-Objectif : rendre les stations cliquables.
-
-**Améliorations :**
-
-Conservation des infos complètes dans chaque ligne (return d).
-
-Points plus visibles (r=4).
-
-Clic sur une station → alerte affichant le nom.
-
-**Résultat : exploration station par station.**
-
-3) testprojet2.html — Changement de trajectoire : ajout Leaflet statique
-
-Objectif : placer la densité dans Paris pour faciliter la lecture.
-
-Ce que j’ai ajouté :
-Carte Leaflet en fond (OpenStreetMap).
-Carte figée (pas de zoom, pas de drag).
-SVG D3 superposé au-dessus.
-Désactivation des interactions Leaflet pour garder les clics sur D3.
-Alertes enrichies (nom, capacité, bornettes libres).
-
-**Partie complexe où j’ai utilisé l’IA :**
+**Partie complexe où j’ai utilisé l’IA sur l'ensemble des versions:**
 
 La superposition Leaflet derrière / D3 devant avec gestion du z-index, des positions absolues et des conflits d’événements (pointer-events).
 → L’IA m’a aidé à structurer correctement la page pour obtenir une superposition propre.
