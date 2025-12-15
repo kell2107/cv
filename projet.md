@@ -69,31 +69,23 @@ Mais en avançant, je me suis rendu compte que les contours, affichés seuls sur
 **Ressources et exemples utilisés**
 
 Exemple officiel D3 Density Contours (ObservableHQ)
-
 Documentation de d3.contourDensity()
-
 D3 Graph Gallery (exemples densité 2D)
-
 Dataset Vélib open data : velib-disponibilite-en-temps-reel.csv
-
 Leaflet + OpenStreetMap
 
 **Étapes de réalisation et prototype**
 
 **testprojet.html — Première version fonctionnelle avec D3**
 
-Objectif : afficher une densité sur les stations Vélib.
+**Objectif : afficher une densité sur les stations Vélib.**
 
-Ce que j’ai fait :
+**Ce que j’ai fait :**
 
 Chargement du CSV Vélib (d3.dsv avec séparateur ;).
-
 Extraction et conversion des coordonnées "Coordonnées géographiques" → lat/lon.
-
 Création des échelles x et y.
-
 Calcul et affichage de la densité avec d3.contourDensity().
-
 Ajout des points des stations par-dessus.
 
 **Résultat : densité correcte sur données réelles, mais sans carte de fond.**
@@ -101,7 +93,6 @@ Ajout des points des stations par-dessus.
 **Partie complexe où j’ai utilisé l’IA sur l'ensemble des versions:**
 
 La superposition Leaflet derrière / D3 devant avec gestion du z-index, des positions absolues et des conflits d’événements (pointer-events).
-→ L’IA m’a aidé à structurer correctement la page pour obtenir une superposition propre.
 
 **Résultat : densité lisible directement sur la carte de Paris**
 
