@@ -1,4 +1,4 @@
- **Ce qui a testprojet1.html** 
+ **Ce qui a changé dans testprojet1.html** 
  
  **Ajout d’interaction simple**
 Objectif : rendre les stations cliquables.
