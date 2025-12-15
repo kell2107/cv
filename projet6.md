@@ -1,7 +1,11 @@
-Ce que j’ai rajouté dans testprojet6
+**Ce que j’ai rajouté dans testprojet6**
 
-Dans testprojet6, j’ai proposé une version plus avancée et analytique de la carte de densité des stations Vélib en renforçant l’interactivité et l’exploration des données. L’utilisateur peut non seulement se déplacer et zoomer librement sur la carte, mais aussi ajuster dynamiquement l’intensité du lissage de la densité grâce à un contrôle dédié, ce qui permet d’observer différentes lectures spatiales de la distribution des stations. La synchronisation entre Leaflet et D3 est assurée en continu, avec un recalcul automatique des projections, des contours de densité et des points à chaque interaction ou modification de paramètre, garantissant un alignement précis avec la carte. Enfin, l’affichage des informations a été amélioré par un panneau dédié qui remplace les alertes, offrant une lecture plus claire et plus fluide des caractéristiques de chaque station.
+Dans testprojet6, j’ai proposé une version plus avancée et analytique de la carte de densité des stations Vélib en renforçant l’interactivité et l’exploration des données. 
 
-Ce que j’ai fait avec l’aide de l’IA
+L’utilisateur peut non seulement se déplacer et zoomer librement sur la carte, mais aussi ajuster dynamiquement l’intensité du lissage de la densité grâce à un contrôle dédié, ce qui permet d’observer différentes lectures spatiales de la distribution des stations. La synchronisation entre Leaflet et D3 est assurée en continu, avec un recalcul automatique des projections, des contours de densité et des points à chaque interaction ou modification de paramètre, garantissant un alignement précis avec la carte.
 
-Les parties les plus complexes de testprojet6, réalisées avec l’aide de l’IA, concernent principalement la gestion dynamique des recalculs de densité et la synchronisation entre Leaflet et D3. L’IA m’a aidé à structurer le code pour que les projections des stations et les contours de densité soient recalculés correctement à chaque interaction (zoom, déplacement ou changement de paramètre de lissage), tout en maintenant des performances fluides. Elle m’a également guidé pour que les cercles représentant les stations restent cliquables et que les contours de densité n’interceptent pas les clics, ainsi que pour la mise en place d’un panneau d’informations réactif et lisible pour chaque station.
+Enfin, l’affichage des informations a été amélioré par un panneau dédié qui remplace les alertes, offrant une lecture plus claire et plus fluide des caractéristiques de chaque station.
+
+**Ce que j’ai fait avec l’aide de l’IA**
+
+Les parties les plus complexes de testprojet6, réalisées avec l’aide de l’IA, concernent principalement la gestion dynamique des recalculs de densité et la synchronisation entre Leaflet et D3. L’IA m’a aidé à structurer le code pour que les projections des stations et les contours de densité soient recalculés correctement à chaque interaction (zoom, déplacement ou changement de paramètre de lissage).
