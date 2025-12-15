@@ -1,1 +1,133 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carte Vélib – Densité interactive (bandwidth)</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    #map {
+      width: 100%;
+      max-width: 1000px;
+      height: min(75vh, 700px);
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    #controls {
+      max-width: 1000px;
+      margin: 10px auto;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Carte de densité des stations Vélib</h1>
+
+  <div id="controls">
+    <label>
+      Intensité de la densité :
+      <input type="range" min="10" max="50" value="25" id="bandwidth">
+      <span id="bwValue">25</span>
+    </label>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    const map = L.map("map").setView([48.8566, 2.3522], 12);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19
+    }).addTo(map);
+
+    L.svg().addTo(map);
+    const overlay = d3.select("#map").select("svg");
+    const g = overlay.append("g").attr("class", "leaflet-zoom-hide");
+
+    let points = [];
+    let bandwidth = 25;
+
+    d3.dsv(";", "velib-disponibilite-en-temps-reel.csv", d => {
+      const geo = d["Coordonnées géographiques"];
+      if (!geo) return null;
+      const [lat, lon] = geo.split(",").map(Number);
+      d.lat = lat;
+      d.lon = lon;
+      return d;
+    }).then(data => {
+      points = data.filter(Boolean);
+      render();
+      map.on("zoomend moveend", render);
+    });
+
+    function project(lat, lon) {
+      const p = map.latLngToLayerPoint([lat, lon]);
+      return [p.x, p.y];
+    }
+
+    function render() {
+      const size = map.getSize();
+      overlay.attr("width", size.x).attr("height", size.y);
+
+      const pixelPoints = points.map(d => {
+        const [x, y] = project(d.lat, d.lon);
+        return { ...d, x, y };
+      });
+
+      const density = d3.contourDensity()
+        .x(d => d.x)
+        .y(d => d.y)
+        .size([size.x, size.y])
+        .bandwidth(bandwidth)(pixelPoints);
+
+      const color = d3.scaleSequential(d3.interpolateTurbo)
+        .domain([0, d3.max(density, d => d.value)]);
+
+      g.selectAll("path")
+        .data(density)
+        .join("path")
+        .attr("d", d3.geoPath())
+        .attr("fill", d => color(d.value))
+        .attr("opacity", 0.35)
+        .style("pointer-events", "none");
+
+      g.selectAll("circle")
+        .data(pixelPoints)
+        .join("circle")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", 4)
+        .attr("fill", "black")
+        .attr("opacity", 0.5);
+    }
+
+    const slider = document.getElementById("bandwidth");
+    const bwValue = document.getElementById("bwValue");
+
+    slider.addEventListener("input", () => {
+      bandwidth = +slider.value;
+      bwValue.textContent = bandwidth;
+      render();
+    });
+  </script>
+</body>
+</html>
