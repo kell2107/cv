@@ -148,7 +148,7 @@
       const color = d3.scaleSequential(d3.interpolateTurbo)
         .domain([0, d3.max(density, d => d.value)]);
 
-   // --- Contours de densité (NE capte pas les clics) ---
+   //  Contours de densité (NE capte pas les clics) 
 g.selectAll("path.density")
   .data(density)
   .join("path")
@@ -158,10 +158,10 @@ g.selectAll("path.density")
   .attr("stroke", "#333")
   .attr("stroke-width", 0.15)
   .attr("opacity", 0.35)
-  .style("pointer-events", "none"); // ✅ super important
+  .style("pointer-events", "none"); 
 
 
-// --- Cercles stations (captent bien les clics) ---
+//  Cercles stations (captent bien les clics) 
 g.selectAll("circle.station")
   .data(pixelPoints, d => d["Nom station"])
   .join("circle")
@@ -172,9 +172,9 @@ g.selectAll("circle.station")
   .attr("fill", "black")
   .attr("opacity", 0.55)
   .style("cursor", "pointer")
-  .style("pointer-events", "all")   // ✅ les cercles restent cliquables
+  .style("pointer-events", "all")   // les cercles restent cliquables
   .on("click", (event, d) => {
-    event.originalEvent?.stopPropagation(); // ✅ évite que Leaflet prenne le clic
+    event.originalEvent?.stopPropagation(); //  évite que Leaflet prenne le clic
 
     infoBox.innerHTML = `
       <h2>Informations station</h2>
