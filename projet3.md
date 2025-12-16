@@ -8,3 +8,37 @@ J’ai également structuré le code autour d’une fonction de rendu dédiée, 
 **Ce que j’ai fait avec l’aide de l’IA (parties les plus complexes)**
 
 Les parties  réalisées avec l’aide de l’IA, concernent principalement la gestion du responsive et la synchronisation entre D3 et Leaflet. Cela inclut l’utilisation d’un "ResizeObserver" pour détecter automatiquement les changements de taille du conteneur et relancer le rendu de la carte, la mise à jour dynamique du "viewBox" du SVG, ainsi que l’appel à "map.invalidateSize()" pour forcer Leaflet à se recalculer correctement après un redimensionnement.
+
+**diagramme de flux**
+
+flowchart TD
+
+    A[Chargement page]
+    
+    B[Carte Leaflet statique]
+    
+    C[SVG D3 responsive]
+    
+    D[Chargement CSV]
+    
+    E[Nettoyage données]
+    
+    F[Premier rendu]
+    
+    G[Calcul tailles conteneur]
+    
+    H[Recalcul échelles]
+    
+    I[Densité recalculée]
+    
+    J[Contours + points]
+    
+    K[Resize fenêtre]
+    
+    L[ResizeObserver]
+    
+    M[Nouveau rendu]
+
+    A --> B --> C --> D --> E --> F
+    F --> G --> H --> I --> J
+    K --> L --> M --> G
