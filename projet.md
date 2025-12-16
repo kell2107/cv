@@ -102,15 +102,25 @@ config:
       theme: redux
 ---
 flowchart TD
+
     A[Chargement de la page HTML]
+    
     B[Création du SVG D3]
+    
     C[Chargement du CSV Vélib]
+    
     D[Extraction lat / lon]
+    
     E[Filtrage des données valides]
+    
     F[Création des échelles x / y]
+    
     G[Calcul de la densité<br/>contourDensity]
+    
     H[Création de l'échelle de couleurs]
+    
     I[Affichage des contours de densité]
+    
     J[Affichage des points stations]
 
     A --> B --> C --> D --> E --> F --> G --> H --> I
